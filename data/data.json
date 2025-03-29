@@ -1,0 +1,29 @@
+{
+    "input_categories": [
+        {
+            "category": "Kategorie",
+            "filters": "New Filter",
+            "dateFrom": "01.01.2023",
+            "dateTo": "31.12.2023",
+            "minValue": 0.0,
+            "maxValue": 1000.0
+        },
+        {
+            "category": "Kategorie",
+            "filters": "",
+            "dateFrom": "01.01.2023",
+            "dateTo": "31.12.2023",
+            "minValue": 0.0,
+            "maxValue": 1000.0
+        },
+        {
+            "category": "Kategorie",
+            "filters": "",
+            "dateFrom": "01.01.2023",
+            "dateTo": "31.12.2023",
+            "minValue": 0.0,
+            "maxValue": 1000.0
+        }
+    ],
+    "output_categories": []
+}
