@@ -55,7 +55,6 @@ class DataManager:
 
         # Save the data to the JSON file
         if switch == "input":
-            print(self.data_data)
             self.data_data["input_categories"] = data_list
             Helper.save_file(self.data_path, self.data_data)
         
@@ -70,12 +69,40 @@ class DataManager:
         """Adds a new category to the list with default values."""
         table_name.insert("", 0, values=("Kategorie", "", "01.01.2023", "31.12.2023", 0.0, 1000.0))
 
-    def delete_category(self, table_name: ttk.Treeview) -> None:
-        """Deletes the selected category from the list."""
-        selected_item = table_name.selection()
-        if selected_item:
-            for item in selected_item:
-                table_name.delete(item)
+    def delete_category(self, treeview: ttk.Treeview) -> None:
+        """Deletes the selected categories from the list."""
+        selected_items = treeview.selection()
+
+        # ? Here is still a small Bug: It's not possible to delete the last item in the List.
+        # If there are selected items, delete them
+        if selected_items:
+            next_item = treeview.next(selected_items[-1])
+
+            # If there is a next item, select it
+            if next_item:
+                treeview.selection_set(next_item)
+                treeview.focus(next_item)
+
+                # If more than one item is selected, delete all of them
+                for item in selected_items:
+                    # Delete the selected item/s
+                    treeview.delete(item)
+
+            # If there are no more items left, select the previous item
+            else:
+                prev_item = treeview.prev(selected_items[0])
+
+                if prev_item:
+                    treeview.selection_set(prev_item)
+                    treeview.focus(prev_item)
+
+                    # If more than one item is selected, delete all of them
+                    for item in selected_items:
+                        # Delete the selected item/s
+                        treeview.delete(item)
+
+
+                
         else:
             # * LOGGING
             print("No item selected to delete.")
