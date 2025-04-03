@@ -32,7 +32,7 @@ class DataManager:
         """Saves the data from the Treeview widget to a JSON file."""
         # List to hold all rows of data
         data_list = [] # List of dictionaries
-        print(treeview["columns"][0])
+
         # Iterate through all items in the Treeview
         for item_id in treeview.get_children():
             # Get the values of the current item
@@ -80,7 +80,7 @@ class DataManager:
             # * LOGGING
             print("No item selected to delete.")
             # Opens a messagebox to inform the user
-            tk.messagebox.showinfo("Info", "Bitte wähle erst eine Kategorie aus, um sie zu löschen.")
+            tk.messagebox.showinfo("Info", "Please choose first a category before you delete.")
 
     def load_categories(self) -> None:
         """Loads categories from the JSON file."""

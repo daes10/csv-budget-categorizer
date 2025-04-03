@@ -1,4 +1,5 @@
 # Settings Manager Class
+import tkinter as tk
 from tkinter import ttk
 import os
 import json
@@ -23,12 +24,6 @@ class SettingsManager:
         settings_path = "test"
         if not os.path.exists(self.settings_path):
             Helper.create_dir(self.settings_path)
-            self.settings_data = {
-                "paths": {
-                    "input_path": "",
-                    "output_path": ""
-                }
-            }
             Helper.save_file(self.settings_path, self.settings_data)
         else:
             print(f"The following path is already existing!\n => {settings_path}")
@@ -49,7 +44,10 @@ class SettingsManager:
 
     def set_paths(self, input_path: str, output_path: str) -> None:
         """Sets and saves the input and output paths."""
-        self.settings_data["paths"]["input_path"] = input_path
-        self.settings_data["paths"]["output_path"] = output_path
-        Helper.save_file(self.settings_path, self.settings_data)
-
+        if os.path.exists(self.settings_path):
+            self.settings_data["paths"]["input_path"] = input_path
+            self.settings_data["paths"]["output_path"] = output_path
+            Helper.save_file(self.settings_path, self.settings_data)
+        else:
+            # Opens a messagebox to inform the user
+            tk.messagebox.showinfo("Info", "No permission to create a settingsfile!")
