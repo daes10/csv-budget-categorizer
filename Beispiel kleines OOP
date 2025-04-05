@@ -1,0 +1,86 @@
+import os
+
+
+dir_path="./data/data.json"
+os.path.dirname(dir_path)
+
+class App:
+    def __init__(self):
+        self.eigenschaft1 = "test"
+        self.eigenschaft2 = "test2"
+
+        # Initialize other classes
+        self.helper = Helper(self) # Aufruf mit der App-Instanz
+        self.helper2 = Helper2() # Aufruf ohne die App-Instanz
+        self.helper3 = Helper3(self.eigene_Methode) # Aufruf mit nur einer Methode der App-Instanz
+
+        # Call the method of the Helper class
+        self.helper.some_method() # Call the method of the Helper2 class without app instance, but instance of Helper2 was passed into it in the initializtion of Helper
+        self.helper2.some_method(self) # Pass the app instance to Helper2's method
+        self.helper3.some_method() # Call the method of the Helper3 class without app instance, but instance of Helper2 was passed into it in the initializtion of Helper3
+    
+    def eigene_Methode(self):
+        print("Das ist eine eigene Methode der App-Klasse. eigene_Methode()")
+        print(self.eigenschaft1)
+
+    def Methode_fuer_Helper(self):
+        print("Von Helper auf Methode_fuer_Helper() zugreifen.")
+        # Hier können Sie auf die Eigenschaften der Helper-Klasse zugreifen
+        # und deren Methoden aufrufen, wenn nötig.
+        # Zum Beispiel:
+        # helper.some_method()
+        print(self.helper.some_property)
+        self.helper.some_property = "neuer_wert"
+        print(self.helper.some_property)
+        print(self.helper2.some_property2)
+        self.helper2.some_property2 = "neuer_wert ZWEI"
+        print(self.helper2.some_property2)
+
+        self.helper.some_method() # Call the method of the Helper class again
+        
+
+class Helper:
+    def __init__(self, app):
+        self.some_property = "alter wert EINS"
+        self.app = app  # Referenz zur App-Instanz setzen
+        
+        # Removing this call to avoid infinite recursion
+        # self.some_method()  
+
+    def some_method(self):
+        print("Das ist eine Methode der Helper-Klasse 1.")
+        # Hier können Sie auf die Eigenschaften der App-Klasse zugreifen
+        # und deren Methoden aufrufen, wenn nötig.
+        # Zum Beispiel:
+        self.app.eigene_Methode()
+        print(self.some_property)
+
+class Helper2:
+    def __init__(self):
+        self.some_property2 = "alter wert ZWEI"
+
+    def some_method(self, app):
+        print("Das ist eine Methode der Helper-Klasse 2.")
+        # Hier können Sie auf die Eigenschaften der App-Klasse zugreifen
+        app.Methode_fuer_Helper()
+        print(self.some_property2)
+
+
+class Helper3:
+    def __init__(self, method):
+        self.some_property = "alter wert DREI"
+        self.eigene_Methode = method  # Referenz zur Methode setzen von der App-Klasse
+        
+        # Removing this call to avoid infinite recursion
+        # self.some_method()  
+
+    def some_method(self):
+        print("Das ist eine Methode der Helper-Klasse 3.")
+
+        self.eigene_Methode()
+        print(self.some_property)
+        
+
+# Beispielaufruf
+app = App()
+# app.Methode_fuer_Helper()
