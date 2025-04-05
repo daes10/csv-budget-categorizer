@@ -13,11 +13,11 @@ class App:
         self.main = main
         self.main.title("CSV Formatter")
         self.main.iconbitmap('./img/format_icon.ico')
-        self.center_window(1200, 1000, self.main)
+        self.center_window(1200, 900, self.main)
         self.main.resizable(True, True)
 
         # Initialize settings manager
-        self.settings_manager = SettingsManager()
+        self.settings_manager = SettingsManager(app=self)
 
         # Create GUI components
         self.create_widgets()
@@ -49,7 +49,7 @@ class App:
     def create_widgets(self) -> None:
         """Creates the main GUI components."""
         # Frame for the bankoption
-        bankFrame = ttk.LabelFrame(self.main, text="Bankselektion", labelanchor="nw")
+        bankFrame = ttk.LabelFrame(self.main, text="", labelanchor="nw")
         bankFrame.pack(fill="both", expand="no", padx=10, pady=5)
 
         ## Bank Option
@@ -90,7 +90,7 @@ class App:
 
 
         # Frame for the Input categories
-        inputFrame = ttk.LabelFrame(self.main, text="Einnahmen", labelanchor="nw")
+        inputFrame = ttk.LabelFrame(self.main, text="Einnahmen", labelanchor="n")
         inputFrame.pack(fill="both", expand="yes", padx=10, pady=5)
 
         ## Add an Input Category
@@ -122,7 +122,7 @@ class App:
 
 
         # Frame for the output categories
-        outputFrame = ttk.LabelFrame(self.main, text="Ausgaben", labelanchor="nw")
+        outputFrame = ttk.LabelFrame(self.main, text="Ausgaben", labelanchor="n")
         outputFrame.pack(fill="both", expand="yes", padx=10, pady=5)
 
         ## Add an Output Category
@@ -154,15 +154,112 @@ class App:
 
 
         # Frame for Saving the categories
-        saveFrame = ttk.LabelFrame(self.main, text="Einstellungen", labelanchor="nw")
+        saveFrame = ttk.Frame(self.main)
         saveFrame.pack(fill="both", expand="no", padx=10, pady=5)
 
         ## Save all Categories
-        btnSaveCategories = ttk.Button(saveFrame, text="Kategorien speichern", command=lambda: self.data_manager.save_all_treeviews(self.treeInput, self.treeOutput))
-        btnSaveCategories.pack(padx=5, pady=5, side="left")
+        btnSaveCategories = ttk.Button(saveFrame, text="Daten Konvertieren", command=lambda: self.data_manager.save_all_treeviews(self.treeInput, self.treeOutput))
+        btnSaveCategories.pack(padx=5, pady=5, side="top")
 
 
 
+        # Frame for presets
+        settingsFrame = ttk.LabelFrame(self.main, text="Presets", labelanchor="nw")
+        settingsFrame.pack(fill="both", expand="no", padx=10, pady=5)
+
+        ## Label entry presetname
+        settingsLabel = ttk.Label(settingsFrame, text="Name: ")
+        settingsLabel.pack(padx=5, pady=5, side="left")
+
+        ## Entryfield for saved settings
+        settingsEntry = ttk.Entry(settingsFrame)
+        settingsEntry.pack(padx=5, pady=5, side="left", fill="x", ipadx=100)
+
+        ## Add preset
+        btnSaveSettings = ttk.Button(settingsFrame, text="Hinzufügen", command=lambda: self.add_preset(settingsEntry.get(), settingsEntry))
+        btnSaveSettings.pack(padx=5, pady=5, side="left")
+
+        ## Delete preset
+        btnSaveSettings = ttk.Button(settingsFrame, text="Löschen", command=lambda: self.delete_preset(settingsEntry))
+        btnSaveSettings.pack(padx=5, pady=5, side="left")
+
+        ## Option menu
+        self.presetOption = ttk.OptionMenu(
+            settingsFrame, # window frame
+            self.settings_manager.selected_preset, # selected preset at the moment
+            self.settings_manager.get_selected_preset(), # default start preset
+            *self.settings_manager.presets, # a tuple of all presets
+            command=self.on_preset_change  # Callback for when the preset changes
+        )
+        self.presetOption.pack(padx=5, pady=5, ipadx=20, side="right", expand=True, anchor="w")
+
+        ## Label preset menu
+        presetLabel = ttk.Label(settingsFrame, text="Select Preset: ")
+        presetLabel.pack(padx=5, pady=5, side="right", expand=False)
+
+    def on_preset_change(self, selected_preset: str) -> None:
+        """Callback when the preset is changed."""
+        try:
+            self.settings_manager.set_selected_preset(selected_preset)
+            print(f"Preset changed to: {self.settings_manager.get_selected_preset()}")
+        except ValueError as e:
+            print(e)
+
+    def add_preset(self, add_name: str, entry_widget: ttk.Entry) -> None:
+        """Adds a new preset to the list and saves it."""
+        presets_list = list(self.settings_manager.presets)
+        if not add_name:
+            raise ValueError("No value in datafield!")
+        else:
+            # Check if the name already exists
+            if add_name in presets_list:
+                raise ValueError (f"Preset '{add_name}' already exists.")
+            else:
+                # Add the new name to the list and save it
+                presets_list.append(add_name)
+                self.settings_manager.presets = tuple(presets_list)
+                self.settings_manager.set_preset_menu()
+                # Update Optionsmenu
+                self.update_preset_option_menu()
+                # Delete Entrywidget
+                entry_widget.delete(0, tk.END)
+                # * LOGGING
+                print(f"Added '{add_name}' to the Presets.")
+
+    def delete_preset(self, entry_widget: ttk.Entry) -> None:
+        presets_list = list(self.settings_manager.presets)
+        entryfield_preset = entry_widget.get()
+
+        # Remove preset, that was typed in the entryfield, if it matches
+        if entryfield_preset:
+            if entryfield_preset in presets_list:
+                # If the entryfield has a correct string, delete it
+                presets_list.remove(entryfield_preset)
+                self.settings_manager.presets = tuple(presets_list)
+                self.settings_manager.set_preset_menu()
+                # Update Optionsmenu
+                self.update_preset_option_menu()
+                # Delete Entrywidget
+                entry_widget.delete(0, tk.END)
+                # * LOGGING
+                print(f"Deleted '{entryfield_preset}' from the Presets.")
+            else:
+                raise ValueError(f"'{entryfield_preset}' is not in the Preset-List!")
+        else:
+            raise ValueError("Nothing to delete...")
+
+    def update_preset_option_menu(self) -> None:
+        """Update the OptionMenu with the latest presets."""
+        menu = self.presetOption["menu"]
+        menu.delete(0, "end")  # Clear the current options
+        
+        for preset in self.settings_manager.presets:
+            # Use a lambda that calls on_preset_change instead of just setting the StringVar
+            menu.add_command(label=preset, command=lambda value=preset: self.on_preset_change(value))
+
+        if self.settings_manager.get_selected_preset() not in self.settings_manager.presets:
+            self.settings_manager.set_selected_preset(self.settings_manager.presets[0])
+            
 
 
 
