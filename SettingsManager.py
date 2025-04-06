@@ -17,7 +17,6 @@ class SettingsManager:
 
         # Ensure the settings are loaded at the beginning
         self.load_settings()
-
     
     def __str__(self) -> str:
         """Returns a string representation of the SettingsManager instance."""
@@ -25,14 +24,13 @@ class SettingsManager:
 
     def create_settings_file(self) -> None:
         """Creates the settings file if it doesn't exist."""
-        settings_path = "test"
         if not os.path.exists(self.settings_path):
             Helper.create_dir(self.settings_path)
             self.settings_data = {
-                "paths": {
-                    "input_path": "",
-                    "output_path": ""
-                },
+                # "paths": {
+                #     "input_path": "",
+                #     "output_path": ""
+                # },
                 "preset_menu": {
                     "presets": [],
                     "selected_preset": ""
@@ -50,23 +48,15 @@ class SettingsManager:
         else:
             self.create_settings_file()
 
-    def get_paths(self, entry_input: ttk.Entry, entry_output: ttk.Entry):
-        """Loads all the Settings from a file and sets the filepaths to the corresponding entryfields."""
-        self.load_settings()
-        entry_input.insert(0, self.settings_data["paths"]["input_path"])
-        entry_output.insert(0, self.settings_data["paths"]["output_path"])
-
-    def set_paths(self, input_path: str, output_path: str) -> None:
-        """Sets and saves the input and output paths."""
-        self.settings_data["paths"]["input_path"] = input_path
-        self.settings_data["paths"]["output_path"] = output_path
-        Helper.save_file(self.settings_path, self.settings_data)
-
 
 class PresetManager(SettingsManager):
     """Handles loading, saving, and managing presets."""
     def __init__(self, app, settings_path) -> None:
         super().__init__(app, settings_path) # Call the parent constructor and initialize the required properties
+
+        # Validate settings_path
+        if not settings_path:
+            raise ValueError("settings_path cannot be empty.")
 
         # Define preset properties
         self.presets = self.settings_data.get("preset_menu", {}).get("presets", [])
@@ -80,13 +70,76 @@ class PresetManager(SettingsManager):
         # If we're using the default value, save it to ensure it's properly stored
         if not self.settings_data.get("preset_menu", {}).get("selected_preset"):
             self.set_presets()  # Save the default preset
+        
+        # Preset variables
+        self.preset_dir_path  = os.path.dirname(self.settings_path)  # Get the directory path
+        self.preset_path = self.get_preset_path()  # Get the full preset path
+        self.preset_data = {}
 
-        # Update the preset menu in the app 
-        # self.app.update_preset_menu()
+        # Create preset file if it doesn't exist
+        self.create_presets_file(self.get_preset_path())
+
+        # Load the current presets
+        self.load_presets()
+
 
     def __str__(self) -> str:
         """Returns a string representation of the PresetManager instance."""
         return f"PresetManager: \n  -> presets= {self.presets},\n  -> selected_preset= {self.selected_preset.get()},\n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data}"
+
+    def get_preset_path(self, filename: str= None) -> str:
+        """Returns the path to the current selected preset file or a defined one."""
+        if filename is None:
+            preset_full_path_slashes = os.path.join(self.preset_dir_path, f"{self.get_selected_preset()}.json")
+        else:
+            preset_full_path_slashes = os.path.join(self.preset_dir_path, filename)
+        
+        preset_full_path = preset_full_path_slashes.replace("\\", "/") # Replace backslashes with forward slashes
+        # * DEBUGGING
+        # print(f"Preset path: {preset_full_path}")
+        return preset_full_path
+
+    def create_presets_file(self, path: str) -> None:
+        """Creates and saves a presets file."""
+        self.preset_data = {
+            "paths": {
+                "input_path": "",
+                "output_path": ""
+            }
+        }
+        # Check if the preset directory exists
+        if not os.path.exists(self.preset_dir_path):
+            Helper.create_dir(self.preset_dir_path)
+        # Check if the preset file exists
+        if not os.path.exists(path):
+            Helper.save_file(path, self.preset_data)
+
+    def load_presets(self) -> None:
+        """Loads the presets from the file."""
+        if os.path.exists(self.get_preset_path()):
+            # Load the preset data from the currently selected preset file
+            with open(os.path.join(self.preset_dir_path, f"{self.get_selected_preset()}.json"), "r") as f:
+                self.preset_data = json.load(f)
+        else:
+            # If the preset file doesn't exist, create it
+            self.create_presets_file()
+            # * LOGGING
+            print(f"New preset file created at {self.get_preset_path()}")
+
+    def get_paths(self):
+        """Loads all the Settings from a file and sets the filepaths to the corresponding entryfields."""
+        # Deletes the entry fields
+        self.app.InputEntry.delete(0, tk.END)
+        self.app.OutputEntry.delete(0, tk.END)
+        # Get the paths from the preset data
+        self.app.InputEntry.insert(0, self.preset_data["paths"]["input_path"])
+        self.app.OutputEntry.insert(0, self.preset_data["paths"]["output_path"])
+
+    def set_paths(self, input_path: str, output_path: str) -> None:
+        """Sets and saves the input and output paths."""
+        self.preset_data["paths"]["input_path"] = input_path
+        self.preset_data["paths"]["output_path"] = output_path
+        Helper.save_file(self.get_preset_path(), self.preset_data)
 
     def on_preset_change(self, sel_preset) -> None:
         """Handles the event when the preset is changed."""
@@ -94,14 +147,15 @@ class PresetManager(SettingsManager):
         try:
             self.selected_preset.set(sel_preset)
             self.set_presets()  # Update the presets
+            # * LOGGING
             print("Preset changed to:", sel_preset)
-            
-            # TODO: Implement the logic to handle preset changes
+            # Load the current preset file
+            self.load_presets()
+            # Load the paths from the preset file
+            self.get_paths()
 
         except ValueError as e:
             print(f"Error: {e}")
-        
-        
 
     def get_selected_preset(self) -> str:
         """Returns the currently selected preset."""
@@ -137,8 +191,12 @@ class PresetManager(SettingsManager):
                 self.set_presets()
                 # Delete the entry field
                 self.app.presetEntry.delete(0, tk.END)
+                # Create new file for the new preset
+                self.create_presets_file(self.get_preset_path(f"{preset}.json"))
                 # Update the preset menu
                 self.app.update_preset_menu()
+                # Load the new preset file
+                self.on_preset_change(preset)
             else:
                 raise ValueError(f"Preset '{preset}' already exists.")
 
@@ -156,15 +214,18 @@ class PresetManager(SettingsManager):
             if preset in self.presets:
                 # If it is, remove it from the list and save
                 self.presets.remove(preset)
-                # * LOGGING
-                print(f"Deleted '{preset}' from the presets.")
                 # Save the updated presets to the settings file
                 self.set_presets()
                 # Delete the entry field
                 self.app.presetEntry.delete(0, tk.END)
                 # Update the preset menu
                 self.app.update_preset_menu()
+                # Delete the old preset file
+                os.remove(self.get_preset_path(f"{preset}.json"))
+                # * LOGGING
+                print(f"Deleted preset:  {preset} & file: '{preset}.json'.")
+                # Load the new preset file
+                self.on_preset_change(self.get_selected_preset())
             else:
                 raise ValueError(f"Preset '{preset}' does not exist.")
 
-        

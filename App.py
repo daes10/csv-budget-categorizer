@@ -75,26 +75,26 @@ class App:
         ## Input Path
         InputLabel = ttk.Label(csvPaths, text="CSV-Einlesedatei:")
         InputLabel.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        InputEntry = ttk.Entry(csvPaths)
-        InputEntry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.InputEntry = ttk.Entry(csvPaths)
+        self.InputEntry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         csvPaths.columnconfigure(1, weight=1)
-        btnFileInput = ttk.Button(csvPaths, text="Datei auswählen", command=lambda: self.file_dialog_helper.open_fileDialog(InputEntry))
+        btnFileInput = ttk.Button(csvPaths, text="Datei auswählen", command=lambda: self.file_dialog_helper.open_fileDialog(self.InputEntry))
         btnFileInput.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
         
         ## Output Path
         OutputLabel = ttk.Label(csvPaths, text="CSV-Ausgabepfad:")
         OutputLabel.grid(row=1, column=0, padx=5, pady=5, sticky="w")
-        OutputEntry = ttk.Entry(csvPaths)
-        OutputEntry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.OutputEntry = ttk.Entry(csvPaths)
+        self.OutputEntry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         csvPaths.columnconfigure(1, weight=1)
-        btnFileOutput = ttk.Button(csvPaths, text="Datei auswählen", command=lambda: self.file_dialog_helper.open_fileDialog(OutputEntry))
+        btnFileOutput = ttk.Button(csvPaths, text="Datei auswählen", command=lambda: self.file_dialog_helper.open_fileDialog(self.OutputEntry))
         btnFileOutput.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
 
         ## Load paths from settings.json if it exists
-        self.settings_manager.get_paths(InputEntry, OutputEntry)
+        self.preset_manager.get_paths()
 
         ## Save button
-        btnSavePaths = ttk.Button(csvPaths, text="Speichert Pfade", command=lambda: self.settings_manager.set_paths(InputEntry.get(), OutputEntry.get()))
+        btnSavePaths = ttk.Button(csvPaths, text="Speichert Pfade", command=lambda: self.preset_manager.set_paths(self.InputEntry.get(), self.OutputEntry.get()))
         btnSavePaths.grid(row=2, column=2, padx=5, pady=5, sticky="ew")
     
 
