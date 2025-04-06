@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedTk  # importing ThemedTk libary
-from SettingsManager import SettingsManager
+from SettingsManager import *
 from DataManager import DataManager
 from FileDialogHelper import FileDialogHelper
 
@@ -16,8 +16,17 @@ class App:
         self.center_window(1200, 900, self.main)
         self.main.resizable(True, True)
 
+        # Default settings
+        self.settings_path = "./data/settings.json"
+
         # Initialize settings manager
-        self.settings_manager = SettingsManager(app=self)
+        self.settings_manager = SettingsManager(self, self.settings_path)
+        # * DEBUGGING Settings Manager
+        # print(self.settings_manager)
+        # Initialize preset manager
+        self.preset_manager = PresetManager(self, self.settings_path)
+        # * DEBUGGING Preset Manager
+        # print(self.preset_manager)
 
         # Create GUI components
         self.create_widgets()
@@ -164,101 +173,102 @@ class App:
 
 
         # Frame for presets
-        settingsFrame = ttk.LabelFrame(self.main, text="Presets", labelanchor="nw")
-        settingsFrame.pack(fill="both", expand="no", padx=10, pady=5)
+        presetsFrame = ttk.LabelFrame(self.main, text="Presets", labelanchor="nw")
+        presetsFrame.pack(fill="both", expand="no", padx=10, pady=5)
 
         ## Label entry presetname
-        settingsLabel = ttk.Label(settingsFrame, text="Name: ")
+        settingsLabel = ttk.Label(presetsFrame, text="Name: ")
         settingsLabel.pack(padx=5, pady=5, side="left")
 
         ## Entryfield for saved settings
-        settingsEntry = ttk.Entry(settingsFrame)
+        settingsEntry = ttk.Entry(presetsFrame)
         settingsEntry.pack(padx=5, pady=5, side="left", fill="x", ipadx=100)
 
         ## Add preset
-        btnSaveSettings = ttk.Button(settingsFrame, text="Hinzufügen", command=lambda: self.add_preset(settingsEntry.get(), settingsEntry))
+        btnSaveSettings = ttk.Button(presetsFrame, text="Hinzufügen", command=lambda: self.add_preset(settingsEntry.get(), settingsEntry))
         btnSaveSettings.pack(padx=5, pady=5, side="left")
 
         ## Delete preset
-        btnSaveSettings = ttk.Button(settingsFrame, text="Löschen", command=lambda: self.delete_preset(settingsEntry))
+        btnSaveSettings = ttk.Button(presetsFrame, text="Löschen", command=lambda: self.delete_preset(settingsEntry))
         btnSaveSettings.pack(padx=5, pady=5, side="left")
 
         ## Option menu
-        self.presetOption = ttk.OptionMenu(
-            settingsFrame, # window frame
-            self.settings_manager.selected_preset, # selected preset at the moment
-            self.settings_manager.get_selected_preset(), # default start preset
-            *self.settings_manager.presets, # a tuple of all presets
-            command=self.on_preset_change  # Callback for when the preset changes
-        )
+        self.presetOption = ttk.OptionMenu(presetsFrame, # window frame
+                                           self.preset_manager.selected_preset, # selected preset at the moment
+                                           self.preset_manager.get_selected_preset(), # default start preset
+                                           *self.preset_manager.presets, # a list of all presets ("*"" makes a tuple out of the list)
+                                           direction="above", # direction of the menu
+                                           command=self.preset_manager.on_preset_change  # Callback for when the preset changes
+                                           )
         self.presetOption.pack(padx=5, pady=5, ipadx=20, side="right", expand=True, anchor="w")
+        
 
         ## Label preset menu
-        presetLabel = ttk.Label(settingsFrame, text="Select Preset: ")
+        presetLabel = ttk.Label(presetsFrame, text="Select Preset: ")
         presetLabel.pack(padx=5, pady=5, side="right", expand=False)
 
-    def on_preset_change(self, selected_preset: str) -> None:
-        """Callback when the preset is changed."""
-        try:
-            self.settings_manager.set_selected_preset(selected_preset)
-            print(f"Preset changed to: {self.settings_manager.get_selected_preset()}")
-        except ValueError as e:
-            print(e)
+    # def on_preset_change(self, selected_preset: str) -> None:
+    #     """Callback when the preset is changed."""
+    #     try:
+    #         self.settings_manager.set_selected_preset(selected_preset)
+    #         print(f"Preset changed to: {self.settings_manager.get_selected_preset()}")
+    #     except ValueError as e:
+    #         print(e)
 
-    def add_preset(self, add_name: str, entry_widget: ttk.Entry) -> None:
-        """Adds a new preset to the list and saves it."""
-        presets_list = list(self.settings_manager.presets)
-        if not add_name:
-            raise ValueError("No value in datafield!")
-        else:
-            # Check if the name already exists
-            if add_name in presets_list:
-                raise ValueError (f"Preset '{add_name}' already exists.")
-            else:
-                # Add the new name to the list and save it
-                presets_list.append(add_name)
-                self.settings_manager.presets = tuple(presets_list)
-                self.settings_manager.set_preset_menu()
-                # Update Optionsmenu
-                self.update_preset_option_menu()
-                # Delete Entrywidget
-                entry_widget.delete(0, tk.END)
-                # * LOGGING
-                print(f"Added '{add_name}' to the Presets.")
+    # def add_preset(self, add_name: str, entry_widget: ttk.Entry) -> None:
+    #     """Adds a new preset to the list and saves it."""
+    #     presets_list = list(self.settings_manager.presets)
+    #     if not add_name:
+    #         raise ValueError("No value in datafield!")
+    #     else:
+    #         # Check if the name already exists
+    #         if add_name in presets_list:
+    #             raise ValueError (f"Preset '{add_name}' already exists.")
+    #         else:
+    #             # Add the new name to the list and save it
+    #             presets_list.append(add_name)
+    #             self.settings_manager.presets = tuple(presets_list)
+    #             self.settings_manager.set_preset_menu()
+    #             # Update Optionsmenu
+    #             self.update_preset_option_menu()
+    #             # Delete Entrywidget
+    #             entry_widget.delete(0, tk.END)
+    #             # * LOGGING
+    #             print(f"Added '{add_name}' to the Presets.")
 
-    def delete_preset(self, entry_widget: ttk.Entry) -> None:
-        presets_list = list(self.settings_manager.presets)
-        entryfield_preset = entry_widget.get()
+    # def delete_preset(self, entry_widget: ttk.Entry) -> None:
+    #     presets_list = list(self.settings_manager.presets)
+    #     entryfield_preset = entry_widget.get()
 
-        # Remove preset, that was typed in the entryfield, if it matches
-        if entryfield_preset:
-            if entryfield_preset in presets_list:
-                # If the entryfield has a correct string, delete it
-                presets_list.remove(entryfield_preset)
-                self.settings_manager.presets = tuple(presets_list)
-                self.settings_manager.set_preset_menu()
-                # Update Optionsmenu
-                self.update_preset_option_menu()
-                # Delete Entrywidget
-                entry_widget.delete(0, tk.END)
-                # * LOGGING
-                print(f"Deleted '{entryfield_preset}' from the Presets.")
-            else:
-                raise ValueError(f"'{entryfield_preset}' is not in the Preset-List!")
-        else:
-            raise ValueError("Nothing to delete...")
+    #     # Remove preset, that was typed in the entryfield, if it matches
+    #     if entryfield_preset:
+    #         if entryfield_preset in presets_list:
+    #             # If the entryfield has a correct string, delete it
+    #             presets_list.remove(entryfield_preset)
+    #             self.settings_manager.presets = tuple(presets_list)
+    #             self.settings_manager.set_preset_menu()
+    #             # Update Optionsmenu
+    #             self.update_preset_option_menu()
+    #             # Delete Entrywidget
+    #             entry_widget.delete(0, tk.END)
+    #             # * LOGGING
+    #             print(f"Deleted '{entryfield_preset}' from the Presets.")
+    #         else:
+    #             raise ValueError(f"'{entryfield_preset}' is not in the Preset-List!")
+    #     else:
+    #         raise ValueError("Nothing to delete...")
 
-    def update_preset_option_menu(self) -> None:
-        """Update the OptionMenu with the latest presets."""
-        menu = self.presetOption["menu"]
-        menu.delete(0, "end")  # Clear the current options
+    # def update_preset_option_menu(self) -> None:
+    #     """Update the OptionMenu with the latest presets."""
+    #     menu = self.presetOption["menu"]
+    #     menu.delete(0, "end")  # Clear the current options
         
-        for preset in self.settings_manager.presets:
-            # Use a lambda that calls on_preset_change instead of just setting the StringVar
-            menu.add_command(label=preset, command=lambda value=preset: self.on_preset_change(value))
+    #     for preset in self.settings_manager.presets:
+    #         # Use a lambda that calls on_preset_change instead of just setting the StringVar
+    #         menu.add_command(label=preset, command=lambda value=preset: self.on_preset_change(value))
 
-        if self.settings_manager.get_selected_preset() not in self.settings_manager.presets:
-            self.settings_manager.set_selected_preset(self.settings_manager.presets[0])
+    #     if self.settings_manager.get_selected_preset() not in self.settings_manager.presets:
+    #         self.settings_manager.set_selected_preset(self.settings_manager.presets[0])
             
 
 
@@ -269,3 +279,4 @@ if __name__ == "__main__":
     # main_window = ThemedTk(theme="arc")  # Using ThemedTk for a themed window
     app = App(main_window)
     main_window.mainloop() # Mainloop from "main"-Window
+    

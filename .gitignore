@@ -10,4 +10,4 @@ __pycache__
 *.code-workspace
 
 # Project specific
-data/
+/data/

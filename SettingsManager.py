@@ -10,16 +10,18 @@ from HelperClass import Helper
 
 class SettingsManager:
     """Handles loading, saving, and managing settings."""    
-    def __init__(self, app, settings_path="./data/settings.json") -> None:
+    def __init__(self, app, settings_path) -> None:
         self.app = app  # Store the App instance
         self.settings_path = settings_path
         self.settings_data = {}
 
-        self.presets = ("Default", )
-        self.selected_preset = tk.StringVar(value=self.presets[0])
-
         # Ensure the settings are loaded at the beginning
         self.load_settings()
+
+    
+    def __str__(self) -> str:
+        """Returns a string representation of the SettingsManager instance."""
+        return f"SettingsManager: \n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data}"
 
     def create_settings_file(self) -> None:
         """Creates the settings file if it doesn't exist."""
@@ -30,11 +32,15 @@ class SettingsManager:
                 "paths": {
                     "input_path": "",
                     "output_path": ""
+                },
+                "preset_menu": {
+                    "presets": [],
+                    "selected_preset": ""
                 }
             }
             Helper.save_file(self.settings_path, self.settings_data)
         else:
-            print(f"The following path is already existing!\n => {settings_path}")
+            print(f"The following path is already existing!\n => {self.settings_path}")
 
     def load_settings(self) -> None:
         """Loads settings from the JSON file."""
@@ -56,74 +62,75 @@ class SettingsManager:
         self.settings_data["paths"]["output_path"] = output_path
         Helper.save_file(self.settings_path, self.settings_data)
 
+
+class PresetManager(SettingsManager):
+    """Handles loading, saving, and managing presets."""
+    def __init__(self, app, settings_path) -> None:
+        super().__init__(app, settings_path) # Call the parent constructor and initialize the required properties
+
+        # Define preset properties
+        self.presets = ["Default", "Custom"]
+
+
+        # Set the default preset if none is found in settings
+        self.selected_preset = tk.StringVar(value=self.settings_data.get("preset_menu", {}).get("selected_preset") or self.presets[0])
+
+        # If we're using the default value, save it to ensure it's properly stored
+        if not self.settings_data.get("preset_menu", {}).get("selected_preset"):
+            self.set_presets()  # Save the default preset
+
+    def __str__(self) -> str:
+        """Returns a string representation of the PresetManager instance."""
+        return f"PresetManager: \n  -> presets= {self.presets},\n  -> selected_preset= {self.selected_preset.get()},\n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data}"
+
+    def on_preset_change(self, event) -> None:
+        """Handles the event when the preset is changed."""
+        print("Preset changed to:", event)
+        # Update the selected preset variable and save
+        self.selected_preset.set(event)
+        self.set_presets()  # Update the presets
+        # TODO: Implement the logic to handle preset changes
+        
+
     def get_selected_preset(self) -> str:
         """Returns the currently selected preset."""
         return self.selected_preset.get()
 
-    def set_selected_preset(self, preset: str) -> None:
-        """Sets and saves the selected preset."""
-        print(preset)
-        print(self.presets)
-        if preset in self.presets:
-            self.selected_preset.set(preset)
-            self.set_preset_menu()
-        else:
-            raise ValueError(f"Preset '{preset}' is already known.")
-
-    # def get_preset_menu(self) -> dict:
-    #     """Returns the options menu settings."""
-    #     return self.settings_data.get("preset_menu", {})
-
-    def set_preset_menu(self) -> None:
-        """Sets and saves the preset menu settings."""
-        options = {
-            "presets": self.presets,
-            "selected_preset": self.selected_preset.get()
-        }
-                
-        self.settings_data["preset_menu"] = options
-        Helper.save_file(self.settings_path, self.settings_data)
-
-    # def add_preset(self, add_name: str, entry_widget: ttk.Entry) -> None:
-    #     """Adds a new preset to the list and saves it."""
-    #     presets_list = list(self.presets)
-    #     if not add_name:
-    #         raise ValueError("No value in datafield!")
-    #     else:
-    #         # Check if the name already exists
-    #         if add_name in presets_list:
-    #             raise ValueError (f"Preset '{add_name}' already exists.")
-    #         else:
-    #             # Add the new name to the list and save it
-    #             presets_list.append(add_name)
-    #             self.presets = tuple(presets_list)
-    #             self.set_preset_menu()
-    #             entry_widget.delete(0, tk.END)
-
-                
-
-    #             # * LOGGING
-    #             print(f"Added '{add_name}' to the Presets.")
+    def set_presets(self) -> None:
+        """Sets and saves the presets."""
+        # Check if the selected preset is in the list of known presets
+        if self.get_selected_preset() in self.presets:
+            # If it is, set the presets to the data variable
+            self.settings_data["preset_menu"] = {
+                "selected_preset": self.get_selected_preset(), # Get selected preset as a string
+                "presets": self.presets
+            }
         
-    # def delete_preset(self, entry_widget: ttk.Entry) -> None:
-    #     presets_list = list(self.presets)
-    #     entryfield_preset = entry_widget.get()
+        # Save the presets to the settings file
+        Helper.save_file(self.settings_path, self.settings_data)
+        
 
-    #     # Remove preset, that was typed in the entryfield, if it matches
-    #     if entryfield_preset:
-    #         if entryfield_preset in presets_list:
-    #             # If the entryfield has a correct string, delete it
-    #             presets_list.remove(entryfield_preset)
-    #             self.presets = tuple(presets_list)
-    #             self.set_preset_menu()
-    #             # Update Optionsmenu
-    #             self.update_preset_option_menu()
-    #             # Delete Entrywidget
-    #             entry_widget.delete(0, tk.END)
-    #             # * LOGGING
-    #             print(f"Deleted '{entryfield_preset}' from the Presets.")
-    #         else:
-    #             raise ValueError(f"'{entryfield_preset}' is not in the Preset-List!")
+    # def set_selected_preset(self, preset: str) -> None:
+    #     """Sets and saves the selected preset."""
+    #     print(preset)
+    #     print(self.presets)
+    #     if preset in self.presets:
+    #         self.selected_preset.set(preset)
+    #         self.set_preset_menu()
     #     else:
-    #         raise ValueError("Nothing to delete...")
+    #         raise ValueError(f"Preset '{preset}' is already known.")
+
+
+
+    # def set_preset_menu(self) -> None:
+    #     """Sets and saves the preset menu settings."""
+    #     options = {
+    #         "presets": self.presets,
+    #         "selected_preset": self.selected_preset.get()
+    #     }
+                
+    #     self.settings_data["preset_menu"] = options
+    #     Helper.save_file(self.settings_path, self.settings_data)
+
+
 
