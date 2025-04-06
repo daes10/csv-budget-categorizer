@@ -69,8 +69,10 @@ class PresetManager(SettingsManager):
         super().__init__(app, settings_path) # Call the parent constructor and initialize the required properties
 
         # Define preset properties
-        self.presets = ["Default", "Custom"]
-
+        self.presets = self.settings_data.get("preset_menu", {}).get("presets", [])
+        # If no presets are found, create one default preset
+        if not self.presets:
+            self.presets = ["Default Preset"]  # Default preset
 
         # Set the default preset if none is found in settings
         self.selected_preset = tk.StringVar(value=self.settings_data.get("preset_menu", {}).get("selected_preset") or self.presets[0])
@@ -79,17 +81,26 @@ class PresetManager(SettingsManager):
         if not self.settings_data.get("preset_menu", {}).get("selected_preset"):
             self.set_presets()  # Save the default preset
 
+        # Update the preset menu in the app 
+        # self.app.update_preset_menu()
+
     def __str__(self) -> str:
         """Returns a string representation of the PresetManager instance."""
         return f"PresetManager: \n  -> presets= {self.presets},\n  -> selected_preset= {self.selected_preset.get()},\n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data}"
 
-    def on_preset_change(self, event) -> None:
+    def on_preset_change(self, sel_preset) -> None:
         """Handles the event when the preset is changed."""
-        print("Preset changed to:", event)
-        # Update the selected preset variable and save
-        self.selected_preset.set(event)
-        self.set_presets()  # Update the presets
-        # TODO: Implement the logic to handle preset changes
+        # Try update the selected preset variable and save
+        try:
+            self.selected_preset.set(sel_preset)
+            self.set_presets()  # Update the presets
+            print("Preset changed to:", sel_preset)
+            
+            # TODO: Implement the logic to handle preset changes
+
+        except ValueError as e:
+            print(f"Error: {e}")
+        
         
 
     def get_selected_preset(self) -> str:
@@ -105,32 +116,55 @@ class PresetManager(SettingsManager):
                 "selected_preset": self.get_selected_preset(), # Get selected preset as a string
                 "presets": self.presets
             }
+        else:
+            raise ValueError(f"Preset '{self.get_selected_preset()}' is already known.")
         
         # Save the presets to the settings file
         Helper.save_file(self.settings_path, self.settings_data)
+
+    def add_preset(self, preset:str) -> None:
+        """Adds a new preset to the list of presets and saves it."""
+        # Check if the preset is already in the list
+        if not preset:
+            raise ValueError("Preset name cannot be empty.")
+        else:
+            if preset not in self.presets:
+                # If not, add it to the list and save
+                self.presets.append(preset)
+                # * LOGGING
+                print(f"Added '{preset}' to the presets.")
+                # Save the updated presets to the settings file
+                self.set_presets()
+                # Delete the entry field
+                self.app.presetEntry.delete(0, tk.END)
+                # Update the preset menu
+                self.app.update_preset_menu()
+            else:
+                raise ValueError(f"Preset '{preset}' already exists.")
+
+    def delete_preset(self, preset: str) -> None:
+        """Deletes a preset from the list and saves it."""
+        # Check if the preset is in the list
+        if not preset:
+            raise ValueError("Preset name cannot be empty.")
+        else:
+            if self.get_selected_preset() == preset:
+                # If the currently selected preset is the one to be deleted, set it to the next one
+                next_index = (self.presets.index(preset) + 1) % len(self.presets)
+                self.selected_preset.set(self.presets[next_index])
+
+            if preset in self.presets:
+                # If it is, remove it from the list and save
+                self.presets.remove(preset)
+                # * LOGGING
+                print(f"Deleted '{preset}' from the presets.")
+                # Save the updated presets to the settings file
+                self.set_presets()
+                # Delete the entry field
+                self.app.presetEntry.delete(0, tk.END)
+                # Update the preset menu
+                self.app.update_preset_menu()
+            else:
+                raise ValueError(f"Preset '{preset}' does not exist.")
+
         
-
-    # def set_selected_preset(self, preset: str) -> None:
-    #     """Sets and saves the selected preset."""
-    #     print(preset)
-    #     print(self.presets)
-    #     if preset in self.presets:
-    #         self.selected_preset.set(preset)
-    #         self.set_preset_menu()
-    #     else:
-    #         raise ValueError(f"Preset '{preset}' is already known.")
-
-
-
-    # def set_preset_menu(self) -> None:
-    #     """Sets and saves the preset menu settings."""
-    #     options = {
-    #         "presets": self.presets,
-    #         "selected_preset": self.selected_preset.get()
-    #     }
-                
-    #     self.settings_data["preset_menu"] = options
-    #     Helper.save_file(self.settings_path, self.settings_data)
-
-
-
