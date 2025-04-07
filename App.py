@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedTk  # importing ThemedTk libary
-from SettingsManager import *
+from SettingsManager import SettingsManager
+from PresetManager import PresetManager
 from DataManager import DataManager
 from FileDialogHelper import FileDialogHelper
 
@@ -162,7 +163,6 @@ class App:
             self.treeOutput.column(col, width=100, stretch=True, anchor="center")
 
 
-
         # Frame for Saving the categories
         saveFrame = ttk.Frame(self.main)
         saveFrame.pack(fill="both", expand="no", padx=10, pady=5)
@@ -208,6 +208,13 @@ class App:
         presetLabel.pack(padx=5, pady=5, side="right", expand=False)
 
 
+
+        # Keyboard shortcut bindings
+
+        ## Bind the delete key to all treeviews
+        self.main.bind_class("Treeview", "<Delete>", self.kb_tree_delete_row)
+
+
     def update_preset_menu(self) -> None:
         """Update the OptionMenu with the latest presets."""
         menu = self.presetMenu["menu"]
@@ -216,6 +223,30 @@ class App:
         for preset in self.preset_manager.presets:
             # Use a lambda that calls on_preset_change with the preset name
             menu.add_command(label=preset, command=lambda value=preset: self.preset_manager.on_preset_change(value))       
+
+
+
+    # Methods for Keyboard shortcuts
+
+    def kb_tree_delete_row(self, event) -> None:
+        """Handles the delete key event for treeviews."""
+        if event.keysym == "Delete":
+            # Check which treeview is focused and delete the selected item
+            if self.main.focus_get() == self.treeInput:
+                selected_rows = self.treeInput.selection()
+                for row in selected_rows:
+                    self.treeInput.delete(row)
+            elif self.main.focus_get() == self.treeOutput:
+                selected_rows = self.treeOutput.selection()
+                for row in selected_rows:
+                    self.treeOutput.delete(row)
+
+
+
+
+
+
+
 
 
 
