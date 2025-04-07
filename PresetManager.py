@@ -41,9 +41,11 @@ class PresetManager(SettingsManager):
         self.load_presets()
 
 
+
+
     def __str__(self) -> str:
         """Returns a string representation of the PresetManager instance."""
-        return f"PresetManager: \n  -> presets= {self.presets},\n  -> selected_preset= {self.selected_preset.get()},\n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data}"
+        return f"PresetManager: \n  -> presets= {self.presets},\n  -> selected_preset= {self.selected_preset.get()},\n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data},\n  -> preset_path= {self.preset_path},\n  -> preset_dir_path= {self.preset_dir_path},\n  -> preset_data= {self.preset_data}"
 
     def get_preset_path(self, filename: str= None) -> str:
         """Returns the path to the current selected preset file or a defined one."""
@@ -80,7 +82,7 @@ class PresetManager(SettingsManager):
                 self.preset_data = json.load(f)
         else:
             # If the preset file doesn't exist, create it
-            self.create_presets_file()
+            self.create_presets_file(self.get_preset_path())
             # * LOGGING
             print(f"New preset file created at {self.get_preset_path()}")
 
@@ -97,7 +99,7 @@ class PresetManager(SettingsManager):
         """Sets and saves the input and output paths."""
         self.preset_data["paths"]["input_path"] = input_path
         self.preset_data["paths"]["output_path"] = output_path
-        Helper.save_file(self.get_preset_path(), self.preset_data)
+        Helper.update_json_file(self.get_preset_path(), self.preset_data)
 
     def on_preset_change(self, sel_preset) -> None:
         """Handles the event when the preset is changed."""

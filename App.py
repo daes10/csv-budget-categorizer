@@ -40,6 +40,8 @@ class App:
         self.file_dialog_helper = FileDialogHelper()
 
 
+
+
     def center_window(self, window_width, window_height, window_name) -> None:
         """Sets the position of the window to the center of the screen"""
         # Update the "requested size" from geometry manager
@@ -91,9 +93,9 @@ class App:
         btnFileOutput = ttk.Button(csvPaths, text="Datei auswählen", command=lambda: self.file_dialog_helper.open_fileDialog(self.OutputEntry))
         btnFileOutput.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
 
-        ## Load paths from settings.json if it exists
-        self.preset_manager.get_paths()
-
+        ## Load the paths from the current preset
+        self.preset_manager.get_paths()  # Load the paths from the current preset
+        
         ## Save button
         btnSavePaths = ttk.Button(csvPaths, text="Speichert Pfade", command=lambda: self.preset_manager.set_paths(self.InputEntry.get(), self.OutputEntry.get()))
         btnSavePaths.grid(row=2, column=2, padx=5, pady=5, sticky="ew")
@@ -168,7 +170,7 @@ class App:
         saveFrame.pack(fill="both", expand="no", padx=10, pady=5)
 
         ## Save all Categories
-        btnSaveCategories = ttk.Button(saveFrame, text="Daten Konvertieren", command=lambda: self.data_manager.save_all_treeviews(self.treeInput, self.treeOutput))
+        btnSaveCategories = ttk.Button(saveFrame, text="Speichere Kategorien", command=lambda: self.data_manager.save_all_treeviews(self.treeInput, self.treeOutput))
         btnSaveCategories.pack(padx=5, pady=5, side="top")
 
 

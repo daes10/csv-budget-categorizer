@@ -32,7 +32,10 @@ class DataManager:
         """Saves the data from the Treeview widget to a JSON file."""
         # List to hold all rows of data
         data_list = [] # List of dictionaries
-        print(treeview["columns"][0])
+        
+        # * DEBUGGING
+        # print(treeview["columns"][0])
+        
         # Iterate through all items in the Treeview
         for item_id in treeview.get_children():
             # Get the values of the current item
@@ -56,11 +59,13 @@ class DataManager:
         # Save the data to the JSON file
         if switch == "input":
             self.data_data["input_categories"] = data_list
-            Helper.save_file(self.data_path, self.data_data)
         
         if switch == "output":
             self.data_data["output_categories"] = data_list
-            Helper.save_file(self.data_path, self.data_data)
+
+        # Save the data to the current Preset JSON file
+        preset_path = self.app.preset_manager.get_preset_path()
+        Helper.update_json_file(preset_path, self.data_data)
 
         # * DEBUGGING
         # print(json.dumps(self.data_data, indent=4))
