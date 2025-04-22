@@ -141,6 +141,8 @@ class PresetManager(SettingsManager):
         # Check if the preset is already in the list
         if not preset:
             raise ValueError("Preset name cannot be empty.")
+        if len(self.presets) == 1:
+            raise ValueError("Cannot delete the last preset.")
         else:
             if preset not in self.presets:
                 # If not, add it to the list and save
@@ -165,6 +167,8 @@ class PresetManager(SettingsManager):
         # Check if the preset is in the list
         if not preset:
             raise ValueError("Preset name cannot be empty.")
+        if len(self.presets) == 1:
+            raise ValueError("Cannot delete the last preset.")
         else:
             if self.get_selected_preset() == preset:
                 # If the currently selected preset is the one to be deleted, set it to the next one
