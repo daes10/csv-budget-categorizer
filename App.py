@@ -5,13 +5,16 @@ from SettingsManager import SettingsManager
 from PresetManager import PresetManager
 from DataManager import DataManager
 from FileDialogHelper import FileDialogHelper
+from screeninfo import get_monitors  # for centering the window
+import argparse
 
 
 
 class App:
     """Main Application Class"""
-    def __init__(self, main) -> None:
+    def __init__(self, main, monitor_idx=None) -> None:
         self.main = main
+        self.monitor_idx = monitor_idx
         self.main.title("CSV Formatter")
         self.main.iconbitmap('./img/format_icon.ico')
         self.center_window(1200, 900, self.main)
@@ -37,9 +40,7 @@ class App:
         self.data_manager = DataManager(app=self)
 
         # Initialize file dialog helper
-        self.file_dialog_helper = FileDialogHelper()
-
-
+        self.file_dialog_helper = FileDialogHelper() 
 
 
     def center_window(self, window_width, window_height, window_name) -> None:
@@ -47,13 +48,17 @@ class App:
         # Update the "requested size" from geometry manager
         window_name.update_idletasks()
 
-        # Get the requested size of the window
-        screen_width = window_name.winfo_screenwidth()
-        screen_height = window_name.winfo_screenheight()
-
-        # find the x and y axis for the window
-        center_x = int(screen_width / 2 - window_width / 2)
-        center_y = int(screen_height / 2 - window_height / 2)
+        # select monitor by index or default to rightmost
+        monitors = get_monitors()
+        if self.monitor_idx is not None and 0 <= self.monitor_idx < len(monitors):
+            monitor = monitors[self.monitor_idx]
+        else:
+            monitor = max(monitors, key=lambda m: m.x)
+        # compute offset and center on that monitor
+        offset_x, offset_y = monitor.x, monitor.y
+        width, height = monitor.width, monitor.height
+        center_x = offset_x + int((width - window_width) / 2)
+        center_y = offset_y + int((height - window_height) / 2)
 
         # Positioning of the defined window
         window_name.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
@@ -254,8 +259,12 @@ class App:
 
 
 if __name__ == "__main__":
-    main_window = tk.Tk()  # Using Tk for a basic window (optional)
-    # main_window = ThemedTk(theme="arc")  # Using ThemedTk for a themed window
-    app = App(main_window)
-    main_window.mainloop() # Mainloop from "main"-Window
-    
+    # parse optional monitor argument
+    parser = argparse.ArgumentParser(description="CSV Formatter Application")
+    parser.add_argument("--monitor", type=int, default=None,
+                        help="Index of monitor to launch window on (0-based, default: rightmost)")
+    args = parser.parse_args()
+    # create main window and launch app on desired monitor
+    main_window = tk.Tk()
+    app = App(main_window, monitor_idx=args.monitor)
+    main_window.mainloop()
