@@ -37,3 +37,5 @@ class Helper:
         # Write combined data back to file
         with open(file_path, 'w') as f:
             json.dump(existing_data, f, indent=4)
+        
+        return existing_data

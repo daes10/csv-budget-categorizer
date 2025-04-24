@@ -1,9 +1,9 @@
 # Data Manager Class
 import os
 import json
-import tkinter as tk
 from tkinter import ttk
 from HelperClass import Helper
+from tkinter import messagebox
 
 
 class DataManager:
@@ -112,7 +112,7 @@ class DataManager:
             # * LOGGING
             print("No item selected to delete.")
             # Opens a messagebox to inform the user
-            tk.messagebox.showinfo("Info", "Bitte wähle erst eine Kategorie aus, um sie zu löschen.")
+            messagebox.showinfo("Info", "Bitte wähle erst eine Kategorie aus, um sie zu löschen.")
 
     def load_categories(self) -> None:
         """Loads categories from the JSON file."""

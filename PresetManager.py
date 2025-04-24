@@ -47,7 +47,7 @@ class PresetManager(SettingsManager):
         """Returns a string representation of the PresetManager instance."""
         return f"PresetManager: \n  -> presets= {self.presets},\n  -> selected_preset= {self.selected_preset.get()},\n  -> settings_path= {self.settings_path},\n  -> settings_data= {self.settings_data},\n  -> preset_path= {self.preset_path},\n  -> preset_dir_path= {self.preset_dir_path},\n  -> preset_data= {self.preset_data}"
 
-    def get_preset_path(self, filename: str= None) -> str:
+    def get_preset_path(self, filename: str | None = None) -> str:
         """Returns the path to the current selected preset file or a defined one."""
         if filename is None:
             preset_full_path_slashes = os.path.join(self.preset_dir_path, f"{self.get_selected_preset()}.json")
