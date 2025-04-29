@@ -1,12 +1,11 @@
-# Settings Manager Class
-import tkinter as tk
-from tkinter import ttk
+# system imports
 import os
 import json
-from HelperClass import Helper
+import tkinter as tk
+from tkinter import ttk
 
-
-
+# local imports
+from ..utils import Helper
 
 class SettingsManager:
     """Handles loading, saving, and managing settings."""    

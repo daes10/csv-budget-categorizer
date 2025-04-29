@@ -1,8 +1,7 @@
-# FileDialogHelper
+# system imports
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-
 
 class FileDialogHelper:
     """A helper class for file dialog operations"""

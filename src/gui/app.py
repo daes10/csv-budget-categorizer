@@ -1,13 +1,14 @@
+# system imports
 import tkinter as tk
 from tkinter import ttk
 from ttkthemes import ThemedTk  # importing ThemedTk libary
-from SettingsManager import SettingsManager
-from PresetManager import PresetManager
-from DataManager import DataManager
-from FileDialogHelper import FileDialogHelper
 from screeninfo import get_monitors  # for centering the window
-import argparse
 
+# local imports
+from ..classes import SettingsManager
+from ..classes import PresetManager
+from ..classes import DataManager
+from ..utils import FileDialogHelper
 
 
 class App:
@@ -16,9 +17,12 @@ class App:
         self.main = main
         self.monitor_idx = monitor_idx
         self.main.title("CSV Formatter")
-        self.main.iconbitmap('./img/format_icon.ico')
+        self.main.iconbitmap('resources/img/format_icon.ico')
         self.center_window(1200, 900, self.main)
         self.main.resizable(True, True)
+
+        # * DEBUGGING
+        print("Application is starting...")
 
         # Default settings
         self.settings_path = "./data/settings.json"
@@ -68,7 +72,7 @@ class App:
         """Creates the main GUI components."""
         # Frame for the bankoption
         bankFrame = ttk.LabelFrame(self.main, text="", labelanchor="nw")
-        bankFrame.pack(fill="both", expand="no", padx=10, pady=5)
+        bankFrame.pack(fill="both", expand=False, padx=10, pady=5)
 
         ## Bank Option
         bankoption = ttk.Label(bankFrame, text="Bank:")
@@ -78,7 +82,7 @@ class App:
 
         # Frame for the csv paths
         csvPaths = ttk.LabelFrame(self.main, text="Dateipfade", labelanchor="nw")
-        csvPaths.pack(fill="both", expand="no", padx=10, pady=5)
+        csvPaths.pack(fill="both", expand=False, padx=10, pady=5)
 
         ## Input Path
         InputLabel = ttk.Label(csvPaths, text="CSV-Einlesedatei:")
@@ -107,9 +111,10 @@ class App:
     
 
 
+
         # Frame for the Input categories
         inputFrame = ttk.LabelFrame(self.main, text="Einnahmen", labelanchor="n")
-        inputFrame.pack(fill="both", expand="yes", padx=10, pady=5)
+        inputFrame.pack(fill="both", expand=True, padx=10, pady=5)
 
         ## Add an Input Category
         btnAddCategoryInput = ttk.Button(inputFrame, text="Kategorie hinzufügen", command=lambda: self.data_manager.add_category(self.treeInput))
@@ -141,7 +146,7 @@ class App:
 
         # Frame for the output categories
         outputFrame = ttk.LabelFrame(self.main, text="Ausgaben", labelanchor="n")
-        outputFrame.pack(fill="both", expand="yes", padx=10, pady=5)
+        outputFrame.pack(fill="both", expand=True, padx=10, pady=5)
 
         ## Add an Output Category
         btnAddCategoryOutput = ttk.Button(outputFrame, text="Kategorie hinzufügen", command=lambda: self.data_manager.add_category(self.treeOutput))
@@ -172,7 +177,7 @@ class App:
 
         # Frame for Saving the categories
         saveFrame = ttk.Frame(self.main)
-        saveFrame.pack(fill="both", expand="no", padx=10, pady=5)
+        saveFrame.pack(fill="both", expand=False, padx=10, pady=5)
 
         ## Save all Categories
         btnSaveCategories = ttk.Button(saveFrame, text="Speichere Kategorien", command=lambda: self.data_manager.save_all_treeviews(self.treeInput, self.treeOutput))
@@ -182,8 +187,7 @@ class App:
 
         # Frame for presets
         presetsFrame = ttk.LabelFrame(self.main, text="Presets", labelanchor="nw")
-        presetsFrame.pack(fill="both", expand="no", padx=10, pady=5)
-
+        presetsFrame.pack(fill="both", expand=True, padx=10, pady=5)
         ## Label entry presetname
         settingsLabel = ttk.Label(presetsFrame, text="Name: ")
         settingsLabel.pack(padx=5, pady=5, side="left")
@@ -258,13 +262,14 @@ class App:
 
 
 
-if __name__ == "__main__":
-    # parse optional monitor argument
-    parser = argparse.ArgumentParser(description="CSV Formatter Application")
-    parser.add_argument("--monitor", type=int, default=None,
-                        help="Index of monitor to launch window on (0-based, default: rightmost)")
-    args = parser.parse_args()
-    # create main window and launch app on desired monitor
-    main_window = tk.Tk()
-    app = App(main_window, monitor_idx=args.monitor)
-    main_window.mainloop()
+
+# if __name__ == "__main__":
+#     # parse optional monitor argument
+#     parser = argparse.ArgumentParser(description="CSV Formatter Application")
+#     parser.add_argument("--monitor", type=int, default=None,
+#                         help="Index of monitor to launch window on (0-based, default: rightmost)")
+#     args = parser.parse_args()
+#     # create main window and launch app on desired monitor
+#     main_window = tk.Tk()
+#     app = App(main_window, monitor_idx=args.monitor)
+#     main_window.mainloop()

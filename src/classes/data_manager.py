@@ -1,9 +1,11 @@
-# Data Manager Class
+# system imports
 import os
 import json
 from tkinter import ttk
-from HelperClass import Helper
 from tkinter import messagebox
+
+# local imports
+from ..utils import Helper
 
 
 class DataManager:

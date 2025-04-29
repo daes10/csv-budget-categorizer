@@ -1,10 +1,12 @@
-# Preset Manager
-import tkinter as tk
-from tkinter import ttk
+# system imports
 import os
 import json
-from HelperClass import Helper
-from SettingsManager import SettingsManager
+import tkinter as tk
+from tkinter import ttk
+
+# local imports
+from ..utils import Helper
+from .settings_manager import SettingsManager
 
 
 class PresetManager(SettingsManager):
