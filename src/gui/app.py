@@ -1,7 +1,7 @@
 # system imports
 import tkinter as tk
 from tkinter import ttk
-from ttkthemes import ThemedTk  # importing ThemedTk libary
+#from ttkthemes import ThemedTk  # importing ThemedTk libary
 from screeninfo import get_monitors  # for centering the window
 
 # local imports
@@ -67,6 +67,8 @@ class App:
         # Positioning of the defined window
         window_name.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
+    def set_app_dpi_awareness(self) -> None:
+        pass
 
     def create_widgets(self) -> None:
         """Creates the main GUI components."""
@@ -251,25 +253,3 @@ class App:
                 selected_rows = self.treeOutput.selection()
                 for row in selected_rows:
                     self.treeOutput.delete(row)
-
-
-
-
-
-
-
-
-
-
-
-
-# if __name__ == "__main__":
-#     # parse optional monitor argument
-#     parser = argparse.ArgumentParser(description="CSV Formatter Application")
-#     parser.add_argument("--monitor", type=int, default=None,
-#                         help="Index of monitor to launch window on (0-based, default: rightmost)")
-#     args = parser.parse_args()
-#     # create main window and launch app on desired monitor
-#     main_window = tk.Tk()
-#     app = App(main_window, monitor_idx=args.monitor)
-#     main_window.mainloop()

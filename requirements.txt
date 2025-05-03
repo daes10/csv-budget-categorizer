@@ -1,3 +1,1 @@
-# This file is used to install the required packages for the project. (no default packages)
-ttkthemes==3.2.2
 screeninfo==0.8.1
