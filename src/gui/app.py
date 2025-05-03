@@ -1,7 +1,6 @@
 # system imports
 import tkinter as tk
 from tkinter import ttk
-#from ttkthemes import ThemedTk  # importing ThemedTk libary
 from screeninfo import get_monitors  # for centering the window
 
 # local imports
@@ -18,6 +17,7 @@ class App:
         self.monitor_idx = monitor_idx
         self.main.title("CSV Formatter")
         self.main.iconbitmap('resources/img/format_icon.ico')
+        self.set_app_dpi_awareness()
         self.center_window(1200, 900, self.main)
         self.main.resizable(True, True)
 
@@ -68,7 +68,19 @@ class App:
         window_name.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
     def set_app_dpi_awareness(self) -> None:
-        pass
+        """Configure the application to be DPI aware to avoid scaling issues"""
+        try:
+            # Windows-specific DPI awareness
+            from ctypes import windll
+            try:
+                # Newer Windows versions
+                windll.shcore.SetProcessDpiAwareness(1)  # Process is DPI aware
+            except AttributeError:
+                # For older Windows versions
+                windll.user32.SetProcessDPIAware()
+        except (ImportError, Exception) as e:
+            # If all DPI awareness methods fail, log it but continue
+            print(f"Could not set DPI awareness, scaling might be affected: {e}")
 
     def create_widgets(self) -> None:
         """Creates the main GUI components."""
