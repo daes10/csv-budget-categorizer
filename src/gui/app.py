@@ -18,6 +18,7 @@ class App:
         self.main.title("CSV Formatter")
         self.main.iconbitmap('resources/img/format_icon.ico')
         self.set_app_dpi_awareness()
+        
         self.center_window(1200, 900, self.main)
         self.main.resizable(True, True)
 
@@ -52,12 +53,14 @@ class App:
         # Update the "requested size" from geometry manager
         window_name.update_idletasks()
 
-        # select monitor by index or default to rightmost
+        # select display by index or default to rightmost
         monitors = get_monitors()
         if self.monitor_idx is not None and 0 <= self.monitor_idx < len(monitors):
             monitor = monitors[self.monitor_idx]
         else:
+            # select the rightmost display
             monitor = max(monitors, key=lambda m: m.x)
+
         # compute offset and center on that monitor
         offset_x, offset_y = monitor.x, monitor.y
         width, height = monitor.width, monitor.height
@@ -72,15 +75,35 @@ class App:
         try:
             # Windows-specific DPI awareness
             from ctypes import windll
-            try:
-                # Newer Windows versions
-                windll.shcore.SetProcessDpiAwareness(1)  # Process is DPI aware
-            except AttributeError:
-                # For older Windows versions
-                windll.user32.SetProcessDPIAware()
+            # Newer Windows versions
+            windll.shcore.SetProcessDpiAwareness(1)  # Process is DPI aware
         except (ImportError, Exception) as e:
             # If all DPI awareness methods fail, log it but continue
             print(f"Could not set DPI awareness, scaling might be affected: {e}")
+        
+        # Automatisch an DPI des Systems anpassen
+        scaling_factor = self.get_scaling_factor()
+        self.main.tk.call('tk', 'scaling', scaling_factor)
+        print(scaling_factor)
+    
+    def get_scaling_factor(self) -> float:
+        """Determine appropriate scaling factor based on monitor resolution"""
+        monitors = get_monitors()
+        monitor = monitors[0]  # Default to primary monitor
+        
+        # Use the selected monitor if specified
+        if self.monitor_idx is not None and 0 <= self.monitor_idx < len(monitors):
+            monitor = monitors[self.monitor_idx]
+        
+        # Base scaling on resolution
+        if monitor.width >= 3840:  # 4K
+            return 2.5
+        elif monitor.width >= 2560:  # 2K/1440p
+            return 2
+        elif monitor.width >= 1920:  # Full HD
+            return 1.75
+        else:
+            return 1.5
 
     def create_widgets(self) -> None:
         """Creates the main GUI components."""
