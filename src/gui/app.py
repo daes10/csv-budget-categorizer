@@ -19,11 +19,14 @@ class App:
         self.main.iconbitmap('resources/img/format_icon.ico')
         self.set_app_dpi_awareness()
         
-        self.center_window(1200, 900, self.main)
+        # Calculate window size based on screen resolution
+        window_width, window_height = self.calculate_window_size()
+        self.center_window(window_width, window_height, self.main)
         self.main.resizable(True, True)
 
         # * DEBUGGING
         print("Application is starting...")
+        print(f"Window size: {window_width}x{window_height}")
 
         # Default settings
         self.settings_path = "./data/settings.json"
@@ -59,7 +62,8 @@ class App:
             monitor = monitors[self.monitor_idx]
         else:
             # select the rightmost display
-            monitor = max(monitors, key=lambda m: m.x)
+            monitor = monitors[0]
+            #monitor = max(monitors, key=lambda m: m.x)
 
         # compute offset and center on that monitor
         offset_x, offset_y = monitor.x, monitor.y
@@ -97,13 +101,33 @@ class App:
         
         # Base scaling on resolution
         if monitor.width >= 3840:  # 4K
-            return 2.5
+            return 2.75
         elif monitor.width >= 2560:  # 2K/1440p
-            return 2
+            return 2.25
         elif monitor.width >= 1920:  # Full HD
             return 1.75
         else:
-            return 1.5
+            return 1.0
+            
+    def calculate_window_size(self) -> tuple:
+        """Calculate window size based on screen resolution."""
+        monitors = get_monitors()
+        if self.monitor_idx is not None and 0 <= self.monitor_idx < len(monitors):
+            monitor = monitors[self.monitor_idx]
+        else:
+            monitor = monitors[0]
+            #monitor = max(monitors, key=lambda m: m.x)
+        
+        # Use percentage of screen size for window dimensions
+        # Default to 75% of screen width and 80% of screen height
+        width = int(monitor.width * 0.75)
+        height = int(monitor.height * 0.80)
+        
+        # Set minimum and maximum sizes to ensure usability
+        width = max(800, min(width, 1920))  # Min 800px, Max 1920px
+        height = max(600, min(height, 1200))  # Min 600px, Max 1200px
+        
+        return width, height
 
     def create_widgets(self) -> None:
         """Creates the main GUI components."""
