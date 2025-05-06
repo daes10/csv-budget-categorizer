@@ -218,10 +218,12 @@ class App:
         if event.keysym == "Delete":
             # Check which treeview is focused and delete the selected item
             if self.main.focus_get() == self.treeInput:
-                selected_rows = self.treeInput.selection()
-                for row in selected_rows:
-                    self.treeInput.delete(row)
+                self.data_manager.delete_category(self.treeInput)
+                # selected_rows = self.treeInput.selection()
+                # for row in selected_rows:
+                #     self.treeInput.delete(row)
             elif self.main.focus_get() == self.treeOutput:
-                selected_rows = self.treeOutput.selection()
-                for row in selected_rows:
-                    self.treeOutput.delete(row)
+                self.data_manager.delete_category(self.treeOutput)
+                # selected_rows = self.treeOutput.selection()
+                # for row in selected_rows:
+                #     self.treeOutput.delete(row)
