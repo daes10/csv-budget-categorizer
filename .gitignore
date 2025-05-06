@@ -11,3 +11,6 @@ __pycache__
 
 # Project specific
 /data/
+
+# Logs
+/logs/
