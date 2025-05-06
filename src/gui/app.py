@@ -7,12 +7,15 @@ from .window_manager import WindowManager
 from ..classes import SettingsManager
 from ..classes import PresetManager
 from ..classes import DataManager
-from ..utils import FileDialogHelper
-
+from ..utils import FileDialogHelper 
+from ..utils.logging import logger
 
 class App:
     """Main Application Class"""
     def __init__(self, main, monitor_idx=None) -> None:
+        # Log application startup
+        logger.debug("Application starting")
+
         self.main = main
         self.main.title("CSV Formatter")
         self.main.iconbitmap('resources/img/format_icon.ico')
