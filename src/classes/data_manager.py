@@ -80,41 +80,28 @@ class DataManager:
         """Deletes the selected categories from the list."""
         selected_items = treeview.selection()
 
-        # ? Here is still a small Bug: It's not possible to delete the last item in the List.
-        # If there are selected items, delete them
         if selected_items:
             next_item = treeview.next(selected_items[-1])
+            prev_item = treeview.prev(selected_items[0])
 
-            # If there is a next item, select it
             if next_item:
                 treeview.selection_set(next_item)
                 treeview.focus(next_item)
 
-                # If more than one item is selected, delete all of them
-                for item in selected_items:
-                    # Delete the selected item/s
-                    treeview.delete(item)
+            if prev_item:
+                treeview.selection_set(prev_item)
+                treeview.focus(prev_item)
 
-            # If there are no more items left, select the previous item
-            else:
-                prev_item = treeview.prev(selected_items[0])
-
-                if prev_item:
-                    treeview.selection_set(prev_item)
-                    treeview.focus(prev_item)
-
-                    # If more than one item is selected, delete all of them
-                    for item in selected_items:
-                        # Delete the selected item/s
-                        treeview.delete(item)
-
-
+            # Delete all selected item/s
+            for item in selected_items:
+                treeview.delete(item)
                 
+        # if no items are selected, give the user some feedback
         else:
             # * LOGGING
             print("No item selected to delete.")
             # Opens a messagebox to inform the user
-            messagebox.showinfo("Info", "Bitte wähle erst eine Kategorie aus, um sie zu löschen.")
+            messagebox.showinfo("Info", "Bitte wähle erst eine Zeile aus, um sie zu löschen.")
 
     def load_categories(self) -> None:
         """Loads categories from the JSON file."""
