@@ -14,7 +14,7 @@ class App:
     """Main Application Class"""
     def __init__(self, main, monitor_idx=None) -> None:
         # Log application startup
-        logger.debug("Application starting")
+        logger.info("Application is starting ...")
 
         self.main = main
         self.main.title("CSV Formatter")
@@ -28,19 +28,16 @@ class App:
 
         # Initialize settings manager
         self.settings_manager = SettingsManager(self, self.settings_path)
-        # * DEBUGGING Settings Manager
-        # print(self.settings_manager)
 
         # Initialize preset manager
         self.preset_manager = PresetManager(self, self.settings_path)
-        # * DEBUGGING Preset Manager
-        # print(self.preset_manager)
 
         # Create GUI components
         self.create_widgets()
 
         # Initialize data manager
         self.data_manager = DataManager(app=self)
+        logger.debug(self.data_manager)
 
         # Initialize file dialog helper
         self.file_dialog_helper = FileDialogHelper() 
@@ -202,15 +199,21 @@ class App:
         ## Bind the delete key to all treeviews
         self.main.bind_class("Treeview", "<Delete>", self.kb_tree_delete_row)
 
+        # * DEBUGGING
+        logger.debug("Widgets created...")
+
 
     def update_preset_menu(self) -> None:
         """Update the OptionMenu with the latest presets."""
+        logger.debug("Update preset optionsmenu...")
         menu = self.presetMenu["menu"]
         menu.delete(0, "end")  # Clear the current options
         
         for preset in self.preset_manager.presets:
             # Use a lambda that calls on_preset_change with the preset name
-            menu.add_command(label=preset, command=lambda value=preset: self.preset_manager.on_preset_change(value))       
+            menu.add_command(label=preset, command=lambda value=preset: self.preset_manager.on_preset_change(value)) 
+        
+        logger.debug("Preset optionsmenu updated.")
 
 
 
@@ -222,11 +225,5 @@ class App:
             # Check which treeview is focused and delete the selected item
             if self.main.focus_get() == self.treeInput:
                 self.data_manager.delete_category(self.treeInput)
-                # selected_rows = self.treeInput.selection()
-                # for row in selected_rows:
-                #     self.treeInput.delete(row)
             elif self.main.focus_get() == self.treeOutput:
                 self.data_manager.delete_category(self.treeOutput)
-                # selected_rows = self.treeOutput.selection()
-                # for row in selected_rows:
-                #     self.treeOutput.delete(row)

@@ -3,6 +3,7 @@ import tkinter as tk
 from screeninfo import get_monitors 
 
 # local imports
+from ..utils.logging import logger
 
 class WindowManager:
     """""Handles the window size and DPI awareness for the application."""
@@ -15,16 +16,20 @@ class WindowManager:
         # Calculate window size based on screen resolution
         window_width, window_height = self.calculate_window_size()
         self.center_window(window_width, window_height, self.app.main)
+
         self.app.main.resizable(True, True)
 
         # * DEBUGGING
-        print("Application is starting...")
-        print(f"Window size: {window_width}x{window_height}")
+        logger.debug(f"{self.__str__()}")
+
+    def __str__(self) -> str:
+        """"Returns a string representation of the WindowManager instance."""
+        return f"WindowManager: \n  -> monitor_idx= {self.monitor_idx},\n  -> app= {self.app},\n  -> window_width= {self.calculate_window_size()[0]},\n  -> window_height= {self.calculate_window_size()[1]}"
 
     def center_window(self, window_width, window_height, window_name) -> None:
         """Sets the position of the window to the center of the screen"""
         # Update the "requested size" from geometry manager
-        window_name.update_idletasks()  # Remove window_name
+        window_name.update_idletasks()
 
         # select display by index or default to rightmost
         monitors = get_monitors()
@@ -52,7 +57,7 @@ class WindowManager:
             windll.shcore.SetProcessDpiAwareness(1)  # Process is DPI aware
         except (ImportError, Exception) as e:
             # If all DPI awareness methods fail, log it but continue
-            print(f"Could not set DPI awareness, scaling might be affected: {e}")
+            logger.error(f"Could not set DPI awareness, scaling might be affected: {e}")
         
         # Automatisch an DPI des Systems anpassen
         scaling_factor = self.get_scaling_factor()
@@ -94,13 +99,13 @@ class WindowManager:
                 res_factor = 1.0
 
             # * DEBUGGING
-            print(f"Resolution factor: {res_factor}\nDPI factor: {dpi_factor}\nMonitor (width x height): {monitor.width}x{monitor.height}")
-            print(f"Scaling factor: {res_factor * dpi_factor}")
+            logger.debug(f"Resolution factor: {res_factor}\nDPI factor: {dpi_factor}\nMonitor (width x height): {monitor.width}x{monitor.height}")
+            logger.debug(f"Scaling factor: {res_factor * dpi_factor}")
             # Combine both factors for a more accurate scaling
             return res_factor * dpi_factor
             
         except Exception as e:
-            print(f"Could not get DPI value: {e}. Falling back to resolution-based scaling.")
+            logger.error(f"Could not get DPI value: {e}. Falling back to resolution-based scaling.")
             
             # Fall back to original resolution-based scaling
             if monitor.width >= 3840:  # 4K
@@ -129,4 +134,7 @@ class WindowManager:
         width = max(800, min(width, 1920))  # Min 800px, Max 1920px
         height = max(600, min(height, 1200))  # Min 600px, Max 1200px
         
+        # * DEBUGGING
+        logger.debug(f"Calculated App Window size: {width}x{height}")
+
         return width, height
