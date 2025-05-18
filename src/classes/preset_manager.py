@@ -209,6 +209,6 @@ class PresetManager(SettingsManager):
                 # Load the new preset file
                 self.on_preset_change(self.get_selected_preset())
             else:
-                logger.warning(f"Preset '{preset}' doesn't exists.")
-                messagebox.showwarning("Warning", f"Preset '{preset}' doesn't exists.")
-                raise UserWarning(f"Preset '{preset}' doesn't  exists.")
+                logger.warning(f"Preset '{preset}' doesn't exist.")
+                messagebox.showwarning("Warning", f"Preset '{preset}' doesn't exist.")
+                raise UserWarning(f"Preset '{preset}' doesn't exist.")
