@@ -151,9 +151,9 @@ class PresetManager(SettingsManager):
         """Adds a new preset to the list of presets and saves it."""
         # Check if the preset is already in the list
         if not preset:
-            logger.error("Preset name can't be empty.")
-            raise ValueError("Preset name can't be empty.")
-            messagebox.showinfo("Info", "Please write first the presetname to delete in the entryfield!")
+            logger.warning("Preset name can't be empty.")
+            messagebox.showwarning("Warning", "Can't add empty preset.\nPlease write the preset name in the entry field to add the preset!")
+            raise UserWarning("Preset name can't be empty.")
         else:
             if preset not in self.presets:
                 self.presets.append(preset)
@@ -169,18 +169,21 @@ class PresetManager(SettingsManager):
                 # Load the new preset file
                 self.on_preset_change(preset)
             else:
-                logger.error(f"Preset '{preset}' already exists.")
-                raise ValueError(f"Preset '{preset}' already exists.")
+                logger.warning(f"Preset '{preset}' already exists.")
+                messagebox.showwarning("Warning", f"Preset '{preset}' already exists.")
+                raise UserWarning(f"Preset '{preset}' already exists.")
 
     def delete_preset(self, preset: str) -> None:
         """Deletes a preset from the list and saves it."""
         # Check if the preset is in the list
         if not preset:
-            logger.error("Preset name cannot be empty")
-            raise ValueError("Preset name cannot be empty.")
+            logger.warning("Preset name can't be empty.")
+            messagebox.showwarning("Warning", "Can't delete empty preset.\nPlease write first the presetname in the entryfield to delete the preset!")
+            raise UserWarning("Preset name can't be empty.")
         if len(self.presets) == 1:
-            logger.error("Can't delete last preset in the list.")
-            raise ValueError("Can't delete last preset in the list.")
+            logger.warning("Can't delete last preset in the list.")
+            messagebox.showwarning("Warning", "Can't delete last preset in the list.")
+            raise UserWarning("Can't delete last preset in the list.")
         else:
             if self.get_selected_preset() == preset:
                 # If the currently selected preset is the one to be deleted, set it to the next one
@@ -206,5 +209,6 @@ class PresetManager(SettingsManager):
                 # Load the new preset file
                 self.on_preset_change(self.get_selected_preset())
             else:
-                logger.error(f"Preset '{preset}' doesn't exists.")
-                raise ValueError(f"Preset '{preset}' doesn't  exists.")
+                logger.warning(f"Preset '{preset}' doesn't exist.")
+                messagebox.showwarning("Warning", f"Preset '{preset}' doesn't exist.")
+                raise UserWarning(f"Preset '{preset}' doesn't exist.")
