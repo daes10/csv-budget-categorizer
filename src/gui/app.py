@@ -201,17 +201,19 @@ class App:
         # * DEBUGGING
         logger.debug("Widgets created...")
 
-
     def update_preset_menu(self) -> None:
         """Update the OptionMenu with the latest presets."""
         logger.debug("Update preset optionsmenu...")
-        menu = self.presetMenu["menu"]
-        menu.delete(0, "end")  # Clear the current options
+        # Update optionmenu
+        self.presetMenu.configure(values=self.preset_manager.presets)
         
-        for preset in self.preset_manager.presets:
-            # Use a lambda that calls on_preset_change with the preset name
-            menu.add_command(label=preset, command=lambda value=preset: self.preset_manager.on_preset_change(value)) 
-        
+        # Set the current preset to the newly optionmenu
+        current_preset = self.preset_manager.get_selected_preset()
+        if current_preset in self.preset_manager.presets:
+            self.presetMenu.set(current_preset)
+        else:
+            logger.critical(f"Preset in optionmenu can't update to correct value. This because the current preset: '{current_preset}' is not available in the presetslist!")
+            raise ValueError(f"Preset in optionmenu can't update to correct value. This because the current preset: '{current_preset}' is not available in the presetslist!")
         logger.debug("Preset optionsmenu updated.")
 
 
