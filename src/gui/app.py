@@ -212,8 +212,8 @@ class App:
         if current_preset in self.preset_manager.presets:
             self.presetMenu.set(current_preset)
         else:
-            logger.critical(f"Preset in optionmenu can't update to correct value. This because the current preset: '{current_preset}' is not available in the presetslist!")
-            raise ValueError(f"Preset in optionmenu can't update to correct value. This because the current preset: '{current_preset}' is not available in the presetslist!")
+            logger.critical(f"Failed to update preset option menu: the current preset '{current_preset}' is not among the available presets.")
+            raise ValueError(f"Failed to update preset option menu: the current preset '{current_preset}' is not among the available presets.")
         logger.debug("Preset optionsmenu updated.")
 
 
