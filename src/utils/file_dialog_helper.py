@@ -16,6 +16,6 @@ class FileDialogHelper:
             initialdir="./",
             filetypes=[("CSV files", "*.csv")]
         )
-        widget.delete(0, ctk.END)
+        widget.delete(0, tk.END)
         widget.insert(0, filepath)
         return filepath
