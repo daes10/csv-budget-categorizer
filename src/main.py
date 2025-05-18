@@ -1,6 +1,7 @@
 # system imports
 import argparse
 import tkinter as tk
+import customtkinter as ctk
 
 # local imports
 from .gui import App
@@ -14,7 +15,7 @@ def main():
     args = parser.parse_args()
     
     # Create main window and launch app on desired monitor
-    main_window = tk.Tk()
+    main_window = ctk.CTk()
     app = App(main_window, monitor_idx=args.monitor)
     main_window.mainloop()
 

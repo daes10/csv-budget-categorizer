@@ -1,6 +1,7 @@
 # system imports
 import tkinter as tk
 from screeninfo import get_monitors 
+import customtkinter as ctk
 
 # local imports
 from ..utils.logging import logger
@@ -11,6 +12,10 @@ class WindowManager:
         self.app = app
         self.monitor_idx = monitor_idx
         
+        # Set CustomTkinter appearance mode and default color theme
+        ctk.set_appearance_mode("Light")  # "System" (follows OS), "Dark" or "Light"
+        ctk.set_default_color_theme("blue")  # Themes: "blue", "green", "dark-blue"
+ 
         self.set_app_dpi_awareness()
 
         # Calculate window size based on screen resolution

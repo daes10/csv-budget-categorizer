@@ -2,13 +2,14 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+import customtkinter as ctk
 
 class FileDialogHelper:
     """A helper class for file dialog operations"""
     def __init__(self):
         pass
     
-    def open_fileDialog(self, widget: ttk.Entry) -> str:
+    def open_fileDialog(self, widget: ctk.CTkEntry) -> str:
         """Opens a file dialog to select a CSV file and inserts the selected file path into the given widget."""
         filepath = filedialog.askopenfilename(
             title="Öffne CSV-Datei",
