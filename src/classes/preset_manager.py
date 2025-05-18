@@ -152,7 +152,7 @@ class PresetManager(SettingsManager):
         # Check if the preset is already in the list
         if not preset:
             logger.warning("Preset name can't be empty.")
-            messagebox.showwarning("Warning", "Can't delete empty preset.\nPlease write first the presetname in the entryfield to delete the preset!")
+            messagebox.showwarning("Warning", "Can't add empty preset.\nPlease write the preset name in the entry field to add the preset!")
             raise UserWarning("Preset name can't be empty.")
         else:
             if preset not in self.presets:
