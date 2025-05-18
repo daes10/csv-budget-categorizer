@@ -2,9 +2,14 @@
 import argparse
 import tkinter as tk
 import customtkinter as ctk
+import sys
+import os
+
+# Add the parent directory to sys.path to enable absolute imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # local imports
-from .gui import App
+from src.gui import App
 
 def main():
     """Entry point for the CSV Formatter application."""
