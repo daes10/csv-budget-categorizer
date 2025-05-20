@@ -8,16 +8,18 @@ from .window_manager import WindowManager
 from ..classes import SettingsManager
 from ..classes import PresetManager
 from ..classes import DataManager
+from .data_window import DataWindow
 from ..utils import FileDialogHelper 
 from ..utils.logging import logger
 
 class App:
     """Main Application Class"""
-    def __init__(self, main, monitor_idx=None) -> None:
+    def __init__(self, monitor_idx=None) -> None:
         # Log application startup
         logger.info("Application is starting ...")
 
-        self.main = main
+        # Create main window
+        self.main = ctk.CTk()
         self.main.title("CSV Formatter")
         self.main.iconbitmap('resources/img/format_icon.ico')
 
@@ -32,6 +34,9 @@ class App:
 
         # Initialize preset manager
         self.preset_manager = PresetManager(self, self.settings_path)
+
+        # Initialize data window
+        self.data_window = DataWindow(self.main, app=self)
 
         # Create GUI components
         self.create_widgets()

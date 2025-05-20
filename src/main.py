@@ -14,10 +14,9 @@ def main():
                         help="Index of monitor to launch window on (0-based, default: rightmost)")
     args = parser.parse_args()
     
-    # Create main window and launch app on desired monitor
-    main_window = ctk.CTk()
-    app = App(main_window, monitor_idx=args.monitor)
-    main_window.mainloop()
+    # Launch app on desired monitor
+    app = App(monitor_idx=args.monitor)
+    app.main.mainloop()
 
 if __name__ == "__main__":
     main()
