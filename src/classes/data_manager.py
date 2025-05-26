@@ -9,10 +9,10 @@ from ..utils import Helper
 from ..utils.logging import logger
 
 class DataManager:
-    """Handles loading, saving, and managing settings."""
-    def __init__(self, app, data_path="./data/data.json"):
+    """Handles loading, saving, and managing data from the treeviews."""
+    def __init__(self, app):
         self.app = app  # Store the App instance
-        self.data_path = data_path
+        self.data_path = self.app.preset_manager.get_preset_path()
         self.data_data = {}
 
         # Ensure the data is loaded at the start

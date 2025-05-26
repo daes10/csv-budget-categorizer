@@ -18,7 +18,7 @@ class PresetManager(SettingsManager):
 
         # Validate settings_path
         if not settings_path:
-            raise ValueError("settings_path cannot be empty.")
+            raise ValueError("settings path cannot be empty.")
 
         # Define preset properties
         self.presets = self.settings_data.get("preset_menu", {}).get("presets", [])
@@ -88,6 +88,9 @@ class PresetManager(SettingsManager):
             with open(os.path.join(self.preset_dir_path, f"{self.get_selected_preset()}.json"), "r") as f:
                 self.preset_data = json.load(f)
                 logger.debug(f"Load the preset data from the selected preset file: '{self.get_selected_preset()}.json'")
+                # Load data into treeview widgets
+                self.app.treeInput = self.preset_data["paths"]["input_path"]
+                self.app.treeOutput = self.preset_data["paths"]["output_path"] 
         else:
             # If the preset file doesn't exist, create it
             self.create_presets_file(self.get_preset_path())

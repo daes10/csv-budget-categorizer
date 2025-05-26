@@ -49,5 +49,6 @@ class SettingsManager:
             logger.info("Loading settings from JSON file...")
         else:
             self.create_settings_file()
+            self.load_settings()
 
 

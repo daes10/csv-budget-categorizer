@@ -26,6 +26,7 @@ class App:
 
         # Default settings
         self.settings_path = "./data/settings.json"
+        self.data_path = "./data/data.json"
 
         # Initialize settings manager
         self.settings_manager = SettingsManager(self, self.settings_path)
